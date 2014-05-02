@@ -10,7 +10,8 @@ module Amistad
       #####################################################################################
       has_many  :friendships,
         :class_name => "Amistad::Friendships::#{Amistad.friendship_model}",
-        :foreign_key => "friendable_id"
+        :foreign_key => "friendable_id",
+        :dependent => :delete_all
 
       has_many  :pending_invited,
         :through => :friendships,
@@ -27,7 +28,8 @@ module Amistad
       #####################################################################################
       has_many  :inverse_friendships,
         :class_name => "Amistad::Friendships::#{Amistad.friendship_model}",
-        :foreign_key => "friend_id"
+        :foreign_key => "friend_id",
+        :dependent => :delete_all
 
       has_many  :pending_invited_by,
         :through => :inverse_friendships,
@@ -44,7 +46,8 @@ module Amistad
       #####################################################################################
       has_many  :blocked_friendships,
         :class_name => "Amistad::Friendships::#{Amistad.friendship_model}",
-        :foreign_key => "blocker_id"
+        :foreign_key => "blocker_id",
+        :dependent => :delete_all
 
       has_many  :blockades,
         :through => :blocked_friendships,
@@ -60,7 +63,7 @@ module Amistad
     # suggest a user to become a friend. If the operation succeeds, the method returns true, else false
     def invite(user)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user }.save
+      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; }.save
     end
 
     # approve a friendship invitation. If the operation succeeds, the method returns true, else false
